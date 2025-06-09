@@ -1,0 +1,12 @@
+{
+  "tasks": [
+    {
+      "task": "buy snacks",
+      "done": false
+    },
+    {
+      "task": "buy groc",
+      "done": false
+    }
+  ]
+}

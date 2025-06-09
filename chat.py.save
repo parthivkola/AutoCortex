@@ -1,0 +1,46 @@
+import requests
+import json
+
+# Ask Ollama and capture both streamed output and full response
+def ask_ollama(prompt):
+    response = requests.post(
+        "http://localhost:11434/api/generate",
+        json={
+            "model": "mistral",
+            "prompt": prompt,
+            "stream": True
+        },
+        stream=True
+    )
+
+    print("AutoCortex: ", end='', flush=True)
+    full_response = ""  # Collect the entire response
+    for line in response.iter_lines():
+        if line:
+            try:
+                data = json.loads(line.decode('utf-8'))
+                part = data.get("response", "")
+                print(part, end='', flush=True)
+                full_response += part
+            except json.JSONDecodeError:
+                pass
+    print()
+    return full_response
+
+# Save feedback to a file
+def save_feedback(question, answer, feedback):
+    with open("feedback_log.txt", "a") as file:
+        file.write(f"Q: {question}\nA: {answer}\nFeedback: {feedback}\n\n")
+
+# Main chat loop
+print("🤖 AutoCortex is ready. Type 'exit' to quit.")
+
+while True:
+    user_input = input("You: ")
+    if user_input.lower() == "exit":
+        break
+
+    response = ask_ollama(user_input)
+
+    save_feedback(user_input, response, feedback)
+    print("📝 Thanks! Your feedback has been saved.\n")
